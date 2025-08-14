@@ -14,33 +14,32 @@ public class SQLHelper {
     private SQLHelper() {
     }
 
-    // метод который умеет возвращать подключение к БД
     private static Connection getConn() throws SQLException {
         return DriverManager.getConnection(System.getProperty("db.url"), "app", "pass");
     }
 
-    // метод, который умеет получать код верификации
     @SneakyThrows
     public static DataHelper.VerificationCode getVerificationCode() {
         var codeSQL = "SELECT code FROM auth_codes ORDER BY created DESC LIMIT 1";
-        var conn = getConn();
-        return QUERY_RUNNER.query(conn, codeSQL, new BeanHandler<>(DataHelper.VerificationCode.class));
+        try (var conn = getConn()) {
+            return QUERY_RUNNER.query(conn, codeSQL, new BeanHandler<>(DataHelper.VerificationCode.class));
+        }
     }
 
-    // метод очищающий БД
     @SneakyThrows
     public static void cleanDatabase() {
-        var connection = getConn();
-        QUERY_RUNNER.execute(connection, "DELETE FROM auth_codes");
-        QUERY_RUNNER.execute(connection, "DELETE FROM card_transactions");
-        QUERY_RUNNER.execute(connection, "DELETE FROM cards");
-        QUERY_RUNNER.execute(connection, "DELETE FROM users");
+        try (var conn = getConn()) {
+            QUERY_RUNNER.execute(conn, "DELETE FROM auth_codes");
+            QUERY_RUNNER.execute(conn, "DELETE FROM card_transactions");
+            QUERY_RUNNER.execute(conn, "DELETE FROM cards");
+            QUERY_RUNNER.execute(conn, "DELETE FROM users");
+        }
     }
 
-    // метод, который чистить отдельно таблицу auth_codes (для сброса счетчика успешных логинов)
     @SneakyThrows
     public static void cleanAuthCodes() {
-        var connection = getConn();
-        QUERY_RUNNER.execute(connection, "DELETE FROM auth_codes");
+        try (var conn = getConn()) {
+            QUERY_RUNNER.execute(conn, "DELETE FROM auth_codes");
+        }
     }
 }
