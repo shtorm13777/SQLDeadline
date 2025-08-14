@@ -40,7 +40,7 @@ public class BankLoginTest {
     @DisplayName("Should get error notification if user is not exist in base")
     void shouldGetErrorNotificationIfLoginWithRandomUserWithoutAddingToBase() {
         var authInfo = DataHelper.generateRandomUser();
-        loginPage.validLogin(authInfo);
+        loginPage.login(authInfo);
         loginPage.verifyErrorNotification("Ошибка! Неверно указан логин или пароль");
     }
 
